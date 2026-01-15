@@ -1,6 +1,6 @@
 package com.optivem.test.systemtest.smoketest.rc;
 
-import com.optivem.calculator.CalculatorService;
+import com.optivem.test.CalculatorService;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
