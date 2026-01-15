@@ -15,10 +15,10 @@ This acceptance test module verifies that:
 ### Test downloading from Maven Central
 ```bash
 # Run the acceptance tests
-./gradlew acceptance-test:test
+./gradlew system-test:smoke-test-rc:test
 
 # Verify dependencies can be resolved
-./gradlew acceptance-test:verifyDependencies
+./gradlew system-test:smoke-test-rc:verifyDependencies
 ```
 
 ### Test downloading from GitHub Packages
@@ -53,7 +53,7 @@ dependencies {
 
 4. Run the tests:
 ```bash
-./gradlew acceptance-test:test
+./gradlew system-test:smoke-test-rc:test
 ```
 
 ## Test Structure
