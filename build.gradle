@@ -1,8 +1,10 @@
 // Root project configuration for multi-module setup
 
+def baseVersion = '1.0.2'
+
 allprojects {
     group = 'com.optivem'
-    version = '1.0.2'
+    version = project.hasProperty('version') ? project.property('version') : baseVersion
 }
 
 subprojects {

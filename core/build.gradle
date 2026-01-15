@@ -5,11 +5,6 @@ plugins {
     id 'signing'
 }
 
-// Allow version to be overridden via -Pversion parameter
-if (project.hasProperty('version')) {
-    version = project.property('version')
-}
-
 repositories {
     mavenCentral()
 }
