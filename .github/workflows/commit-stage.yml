@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write # Required for publishing to GitHub Packages
 
     steps:
     - uses: actions/checkout@v4
@@ -47,7 +48,7 @@ jobs:
       run: ./gradlew core:publish --no-daemon -Pversion="${{ steps.extract_version.outputs.base_version }}-rc.${{ github.run_number }}"
       env:
         GITHUB_USERNAME: ${{ github.actor }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_WRITE_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   dependency-submission:
