@@ -1,0 +1,56 @@
+name: Acceptance Stage
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    # Run every hour to verify published packages are still accessible
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+concurrency:
+  group: acceptance-stage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Needed to publish to and download from GitHub Packages
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: 21
+        distribution: 'temurin'
+        
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: wrapper
+        
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+      
+    - name: Build and publish library to GitHub Packages
+      run: ./gradlew publish --no-daemon
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Verify package dependencies can be resolved
+      run: ./gradlew acceptance-test:verifyDependencies --no-daemon
+      env:
+        GITHUB_USERNAME: ${{ github.actor }}
+        GITHUB_READ_PACKAGES_TOKEN: ${{ secrets.READ_PACKAGES_TOKEN }}
+        
+    - name: Run acceptance tests
+      run: ./gradlew acceptance-test:test --no-daemon
+      env:
+        GITHUB_USERNAME: ${{ github.actor }}
+        GITHUB_READ_PACKAGES_TOKEN: ${{ secrets.READ_PACKAGES_TOKEN }}
