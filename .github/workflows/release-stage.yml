@@ -35,6 +35,37 @@ jobs:
       id: version
       uses: ./.github/actions/extract-base-version
       
+    - name: Check if version already exists
+      id: check_version
+      run: |
+        VERSION="${{ steps.version.outputs.base_version }}"
+        echo "Checking if version $VERSION already exists..."
+        
+        # Check if package version exists in GitHub Packages
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ github.repository }}/packages/maven/com.optivem.optivem-test/versions")
+        
+        if [ "$HTTP_CODE" = "200" ]; then
+          # Package exists, check if this specific version exists
+          EXISTS=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/packages/maven/com.optivem.optivem-test/versions" \
+            | jq -r --arg version "$VERSION" '.[] | select(.name == $version) | .name')
+          
+          if [ "$EXISTS" = "$VERSION" ]; then
+            echo "❌ Version $VERSION already exists in GitHub Packages!"
+            echo "Please update the version in build.gradle before releasing."
+            exit 1
+          else
+            echo "✅ Version $VERSION does not exist yet. Proceeding with release..."
+          fi
+        else
+          echo "✅ No packages found or unable to check. Proceeding with release..."
+        fi
+        
     - name: Publish to GitHub Packages with the Final Version
       run: ./gradlew core:publish --no-daemon -Pversion="${{ steps.version.outputs.base_version }}"
       env:
@@ -46,6 +77,14 @@ jobs:
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_READ_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Create Git Tag
+      run: |
+        VERSION="v${{ steps.version.outputs.base_version }}"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag -a "$VERSION" -m "Release $VERSION"
+        git push origin "$VERSION"
         
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
