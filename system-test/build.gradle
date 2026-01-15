@@ -8,54 +8,61 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-
-    maven {
-        url = uri("https://maven.pkg.github.com/optivem/optivem-test-java")
-        credentials {
-           username = System.getenv("GITHUB_USERNAME")
-           password = System.getenv("GITHUB_READ_PACKAGES_TOKEN")
+// Common configuration for all submodules
+subprojects {
+    apply plugin: 'java'
+    
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
         }
     }
-}
-
-dependencies {
-    // Core module dependency
-    testImplementation project(':core')
     
-    // Automatically use the latest RC version matching the project version
-    testImplementation "com.optivem:optivem-test:${rootProject.ext.baseVersion}-rc.+"
-    testImplementation 'junit:junit:4.13.2'
-}
+    repositories {
+        mavenCentral()
 
-test {
-    useJUnit()
-    
-    // Print more detailed test output
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "full"
-    }
-}
-
-// Task to verify the package can be resolved
-task verifyDependencies {
-    inputs.files(configurations.testRuntimeClasspath)
-    doLast {
-        println "Verifying that optivem-test dependency can be resolved..."
-        def found = false
-        inputs.files.each { file ->
-            if (file.name.contains('optivem-test')) {
-                println "✓ Found optivem-test dependency: ${file.name}"
-                found = true
+        maven {
+            url = uri("https://maven.pkg.github.com/optivem/optivem-test-java")
+            credentials {
+               username = System.getenv("GITHUB_USERNAME")
+               password = System.getenv("GITHUB_READ_PACKAGES_TOKEN")
             }
         }
-        if (!found) {
-            throw new GradleException("optivem-test dependency not found!")
+    }
+    
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
+    }
+    
+    test {
+        useJUnitPlatform()
+        
+        // Print more detailed test output
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
         }
     }
+    
+    // Task to verify the package can be resolved
+    task verifyDependencies {
+        inputs.files(configurations.testRuntimeClasspath)
+        doLast {
+            println "Verifying that optivem-test dependency can be resolved..."
+            def found = false
+            inputs.files.each { file ->
+                if (file.name.contains('optivem-test')) {
+                    println "✓ Found optivem-test dependency: ${file.name}"
+                    found = true
+                }
+            }
+            if (!found) {
+                throw new GradleException("optivem-test dependency not found!")
+            }
+        }
+    }
+    
+    // Verify dependencies before running tests
+    test.dependsOn verifyDependencies
 }
-
-// Verify dependencies before running tests
-test.dependsOn verifyDependencies

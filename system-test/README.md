@@ -21,6 +21,9 @@ The system-test module is designed to run comprehensive end-to-end tests that ve
 ### smoke-test-rc
 Smoke tests designed to verify the basic functionality of release candidate versions.
 
+### smoke-test-release
+Smoke tests designed to verify the basic functionality of stable release versions.
+
 ## Running Tests
 
 To run all system tests:
@@ -28,14 +31,18 @@ To run all system tests:
 ./gradlew system-test:test
 ```
 
-To run smoke tests specifically:
+To run smoke tests for RC versions:
 ```bash
 ./gradlew system-test:smoke-test-rc:test
+```
+
+To run smoke tests for release versions:
+```bash
+./gradlew system-test:smoke-test-release:test
 ```
 
 ## Dependencies
 
 This module depends on:
-- The `core` module
 - The main `optivem-test` library
 - JUnit for test framework
