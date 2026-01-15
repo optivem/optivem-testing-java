@@ -36,8 +36,15 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build --no-daemon
 
-    - name: Build and publish library to GitHub Packages
-      run: ./gradlew publish --no-daemon
+    - name: Extract version from build.gradle
+      id: extract_version
+      run: |
+        VERSION=$(grep "version = " build.gradle | sed "s/version = '//" | sed "s/'//")
+        echo "base_version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+
+    - name: Build and publish library to GitHub Packages with RC version
+      run: ./gradlew publish --no-daemon -Pversion="${{ steps.extract_version.outputs.base_version }}-rc.${{ github.run_number }}"
       env:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
