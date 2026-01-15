@@ -10,7 +10,13 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
+    // Main dependencies for test extensions and utilities
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.11.2'
+    implementation 'org.junit.jupiter:junit-jupiter-params:5.11.2'
+    
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 java {
@@ -22,7 +28,7 @@ java {
 }
 
 test {
-    useJUnit()
+    useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
 

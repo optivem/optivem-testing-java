@@ -6,6 +6,13 @@ package com.optivem.test;
 public class CalculatorService {
     
     /**
+     * Creates a new CalculatorService instance.
+     */
+    public CalculatorService() {
+        // Default constructor
+    }
+    
+    /**
      * Adds two numbers.
      * @param a first number
      * @param b second number

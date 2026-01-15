@@ -1,8 +1,8 @@
 package com.optivem.test;
 
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for CalculatorService.
@@ -11,7 +11,7 @@ public class CalculatorServiceTest {
     
     private CalculatorService calculator;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         calculator = new CalculatorService();
     }
@@ -44,13 +44,17 @@ public class CalculatorServiceTest {
         assertEquals(0.5, calculator.divide(1.0, 2.0), 0.001);
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDivideByZero() {
-        calculator.divide(5.0, 0.0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculator.divide(5.0, 0.0);
+        });
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDivideByZeroWithNegative() {
-        calculator.divide(-5.0, 0.0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculator.divide(-5.0, 0.0);
+        });
     }
 }
