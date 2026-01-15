@@ -9,6 +9,11 @@ repositories {
     mavenCentral()
 }
 
+// Set version explicitly if not provided
+if (!project.hasProperty('version') || version == 'unspecified') {
+    version = rootProject.ext.baseVersion
+}
+
 dependencies {
     // Main dependencies for test extensions and utilities
     implementation 'org.junit.jupiter:junit-jupiter-api:5.11.2'
@@ -88,10 +93,9 @@ publishing {
                 password = System.getenv("GITHUB_WRITE_PACKAGES_TOKEN")
             }
         }
-        
         maven {
-            name = "CentralPortal"
-            url = uri("https://central.sonatype.com/api/v1/publisher/upload")
+            name = "MavenCentral"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
                 username = System.getenv("SONATYPE_USERNAME")
                 password = System.getenv("SONATYPE_PASSWORD")
@@ -100,20 +104,114 @@ publishing {
     }
 }
 
-signing {
-    required { gradle.taskGraph.hasTask("publishMavenPublicationToCentralPortalRepository") }
-    
-    def signingKey = System.getenv("GPG_PRIVATE_KEY")
-    def signingPassword = System.getenv("GPG_PASSPHRASE")
-    
-    if (signingKey && signingPassword) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+// Signing configuration - only enabled when publishing to Maven Central
+def enableSigning = System.getenv("ENABLE_SIGNING") == "true"
+def signingKeyPath = System.getenv("GPG_PRIVATE_KEY")
+def signingPassword = System.getenv("GPG_PASSPHRASE")
+
+if (enableSigning && signingKeyPath && signingPassword) {
+    signing {
+        required = { gradle.taskGraph.hasTask("publishMavenPublicationToMavenCentralRepository") }
+        
+        // Check if it's a file path or the actual key content
+        def keyFile = new File(signingKeyPath)
+        if (keyFile.exists()) {
+            // Read key from file
+            def signingKey = keyFile.text
+            useInMemoryPgpKeys(signingKey, signingPassword)
+        } else {
+            // Treat as direct key content (fallback)
+            useInMemoryPgpKeys(signingKeyPath, signingPassword)
+        }
+        sign publishing.publications.maven
     }
-    
-    sign publishing.publications.maven
 }
 
-signing {
-    required = { gradle.taskGraph.hasTask("publish") }
-    sign publishing.publications.maven
+task createCentralPortalBundle {
+    dependsOn 'publishToMavenLocal'
+    description 'Create a bundle for Sonatype Central Portal upload'
+    
+    doLast {
+        def username = System.getenv("SONATYPE_USERNAME")
+        def password = System.getenv("SONATYPE_PASSWORD")
+        
+        if (!username || !password) {
+            throw new GradleException("SONATYPE_USERNAME and SONATYPE_PASSWORD environment variables must be set")
+        }
+        
+        def localRepo = "${System.getProperty('user.home')}/.m2/repository"
+        def artifactPath = "${localRepo}/com/optivem/optivem-test/${version}"
+        def buildPath = layout.buildDirectory.get().asFile.absolutePath
+        def bundleDir = "${buildPath}/central-portal-bundle"
+        def bundleZip = "${buildPath}/central-portal-bundle.zip"
+        
+        println "Creating bundle for Central Portal upload..."
+        println "Username: ${username}"
+        println "Version: ${version}"
+        println "Artifact path: ${artifactPath}"
+        println "Bundle path: ${bundleZip}"
+        
+        // Create bundle using Ant tasks (built into Gradle)
+        delete bundleDir
+        mkdir bundleDir
+        
+        copy {
+            from "${artifactPath}/optivem-test-${version}.pom"
+            from "${artifactPath}/optivem-test-${version}.jar"  
+            from "${artifactPath}/optivem-test-${version}-sources.jar"
+            from "${artifactPath}/optivem-test-${version}-javadoc.jar"
+            into bundleDir
+        }
+        
+        ant.zip(destfile: bundleZip) {
+            fileset(dir: bundleDir)
+        }
+        
+        println ""
+        println "✅ Bundle created successfully: ${bundleZip}"
+        println ""
+        println "To upload to Central Portal, run this command:"
+        println ""
+        println "curl -X POST \\"
+        println "  https://central.sonatype.com/api/v1/publisher/upload \\"
+        println "  -u '${username}:${password}' \\"
+        println "  -F 'bundle=@${bundleZip}' \\"
+        println "  -F 'publishingType=USER_MANAGED'"
+        println ""
+        println "Or run: gradlew :core:uploadToCentralPortal"
+    }
+}
+
+task uploadToCentralPortal {
+    dependsOn 'createCentralPortalBundle'
+    description 'Upload bundle to Sonatype Central Portal'
+    
+    doLast {
+        def username = System.getenv("SONATYPE_USERNAME")
+        def password = System.getenv("SONATYPE_PASSWORD")
+        def buildPath = layout.buildDirectory.get().asFile.absolutePath
+        def bundleZip = "${buildPath}/central-portal-bundle.zip"
+        
+        println "Uploading to Central Portal..."
+        
+        def result = exec {
+            commandLine 'curl', '-X', 'POST',
+                'https://central.sonatype.com/api/v1/publisher/upload',
+                '-u', "${username}:${password}",
+                '-F', "bundle=@${bundleZip}",
+                '-F', 'publishingType=USER_MANAGED'
+            standardOutput = new ByteArrayOutputStream()
+            errorOutput = new ByteArrayOutputStream()
+            ignoreExitValue = true
+        }
+        
+        if (result.exitValue == 0) {
+            println "✅ Upload successful!"
+            println "Response: ${result.standardOutput.toString()}"
+        } else {
+            println "❌ Upload failed!"
+            println "Error: ${result.errorOutput.toString()}"
+            throw new GradleException("Upload to Central Portal failed")
+        }
+    }
 }
