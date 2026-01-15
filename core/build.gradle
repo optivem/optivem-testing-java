@@ -129,7 +129,7 @@ if (enableSigning && signingKeyPath && signingPassword) {
 
 task createCentralPortalBundle {
     dependsOn 'publishToMavenLocal'
-    description 'Create a bundle for Sonatype Central Portal upload'
+    description 'Create a bundle for Sonatype Central Portal upload with proper structure'
     
     doLast {
         def username = System.getenv("SONATYPE_USERNAME")
@@ -143,6 +143,7 @@ task createCentralPortalBundle {
         def artifactPath = "${localRepo}/com/optivem/optivem-test/${version}"
         def buildPath = layout.buildDirectory.get().asFile.absolutePath
         def bundleDir = "${buildPath}/central-portal-bundle"
+        def mavenDir = "${bundleDir}/com/optivem/optivem-test/${version}"
         def bundleZip = "${buildPath}/central-portal-bundle.zip"
         
         println "Creating bundle for Central Portal upload..."
@@ -151,24 +152,65 @@ task createCentralPortalBundle {
         println "Artifact path: ${artifactPath}"
         println "Bundle path: ${bundleZip}"
         
-        // Create bundle using Ant tasks (built into Gradle)
+        // Create bundle directory structure
         delete bundleDir
-        mkdir bundleDir
+        mkdir mavenDir
         
-        copy {
-            from "${artifactPath}/optivem-test-${version}.pom"
-            from "${artifactPath}/optivem-test-${version}.jar"  
-            from "${artifactPath}/optivem-test-${version}-sources.jar"
-            from "${artifactPath}/optivem-test-${version}-javadoc.jar"
-            into bundleDir
+        // Copy all artifacts with checksums and signatures
+        def filesToCopy = [
+            "optivem-test-${version}.pom",
+            "optivem-test-${version}.jar",
+            "optivem-test-${version}-sources.jar", 
+            "optivem-test-${version}-javadoc.jar"
+        ]
+        
+        filesToCopy.each { filename ->
+            // Copy main file
+            copy {
+                from "${artifactPath}/${filename}"
+                into mavenDir
+            }
+            
+            // Generate and copy checksums
+            def sourceFile = file("${artifactPath}/${filename}")
+            if (sourceFile.exists()) {
+                // Generate MD5
+                def md5 = ant.checksum(file: sourceFile, algorithm: "md5", property: "md5")
+                def md5Value = ant.antProject.properties["md5"]
+                file("${mavenDir}/${filename}.md5").text = md5Value
+                
+                // Generate SHA1  
+                def sha1 = ant.checksum(file: sourceFile, algorithm: "sha1", property: "sha1")
+                def sha1Value = ant.antProject.properties["sha1"]
+                file("${mavenDir}/${filename}.sha1").text = sha1Value
+            }
+            
+            // Copy existing checksums and signatures if they exist
+            ['.md5', '.sha1', '.sha256', '.sha512', '.asc', '.asc.md5', '.asc.sha1'].each { ext ->
+                def extraFile = "${artifactPath}/${filename}${ext}"
+                if (file(extraFile).exists()) {
+                    copy {
+                        from extraFile
+                        into mavenDir
+                    }
+                }
+            }
         }
         
+        // Create the zip bundle
         ant.zip(destfile: bundleZip) {
             fileset(dir: bundleDir)
         }
         
+        // List what's in the bundle
         println ""
         println "✅ Bundle created successfully: ${bundleZip}"
+        println ""
+        println "Bundle contents:"
+        fileTree(bundleDir).each { file ->
+            println "  ${file.path.substring(bundleDir.length() + 1)}"
+        }
+        
         println ""
         println "To upload to Central Portal, run this command:"
         println ""
@@ -182,36 +224,32 @@ task createCentralPortalBundle {
     }
 }
 
-task uploadToCentralPortal {
+task uploadToCentralPortal(type: Exec) {
     dependsOn 'createCentralPortalBundle'
     description 'Upload bundle to Sonatype Central Portal'
     
-    doLast {
+    doFirst {
         def username = System.getenv("SONATYPE_USERNAME")
         def password = System.getenv("SONATYPE_PASSWORD")
         def buildPath = layout.buildDirectory.get().asFile.absolutePath
         def bundleZip = "${buildPath}/central-portal-bundle.zip"
         
+        if (!username || !password) {
+            throw new GradleException("SONATYPE_USERNAME and SONATYPE_PASSWORD environment variables must be set")
+        }
+        
         println "Uploading to Central Portal..."
+        println "Bundle: ${bundleZip}"
         
-        def result = exec {
-            commandLine 'curl', '-X', 'POST',
-                'https://central.sonatype.com/api/v1/publisher/upload',
-                '-u', "${username}:${password}",
-                '-F', "bundle=@${bundleZip}",
-                '-F', 'publishingType=USER_MANAGED'
-            standardOutput = new ByteArrayOutputStream()
-            errorOutput = new ByteArrayOutputStream()
-            ignoreExitValue = true
-        }
-        
-        if (result.exitValue == 0) {
-            println "✅ Upload successful!"
-            println "Response: ${result.standardOutput.toString()}"
-        } else {
-            println "❌ Upload failed!"
-            println "Error: ${result.errorOutput.toString()}"
-            throw new GradleException("Upload to Central Portal failed")
-        }
+        commandLine 'curl', '-X', 'POST',
+            'https://central.sonatype.com/api/v1/publisher/upload',
+            '-u', "${username}:${password}",
+            '-F', "bundle=@${bundleZip}",
+            '-F', 'publishingType=USER_MANAGED'
+    }
+    
+    doLast {
+        println "✅ Upload completed!"
+        println "Check your deployment status at: https://central.sonatype.com/publishing/deployments"
     }
 }
