@@ -1,4 +1,4 @@
-package com.optivem.test.channels;
+package com.optivem.testing.channels;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;

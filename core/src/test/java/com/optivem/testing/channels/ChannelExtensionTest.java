@@ -1,8 +1,8 @@
-package com.optivem.test.channels;
+package com.optivem.testing.channels;
 
-import com.optivem.test.Channel;
-import com.optivem.test.DataSource;
-import com.optivem.test.extensions.ChannelExtension;
+import com.optivem.testing.Channel;
+import com.optivem.testing.DataSource;
+import com.optivem.testing.extensions.ChannelExtension;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.*;

@@ -32,7 +32,7 @@ param(
     [string]$Repository,
     
     [Parameter(Mandatory=$false)]
-    [string]$PackageName = "com.optivem.optivem-test"
+    [string]$PackageName = "com.optivem.optivem-testing"
 )
 
 if ([string]::IsNullOrWhiteSpace($RcVersion)) {

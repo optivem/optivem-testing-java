@@ -239,7 +239,7 @@ task uploadToCentralPortal(type: Exec) {
         def password = System.getenv("SONATYPE_PASSWORD")
         def projectVersion = project.version
         def buildPath = layout.buildDirectory.get().asFile.absolutePath
-        def bundleZip = "${buildPath}/optivem-test-${projectVersion}.zip"
+        def bundleZip = "${buildPath}/optivem-testing-${projectVersion}.zip"
         
         if (!username || !password) {
             throw new GradleException("SONATYPE_USERNAME and SONATYPE_PASSWORD environment variables must be set")

@@ -1,6 +1,6 @@
-package com.optivem.test.systemtest.smoketest.rc;
+package com.optivem.testing.systemtest.smoketest.release;
 
-import com.optivem.test.Channel;
+import com.optivem.testing.Channel;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

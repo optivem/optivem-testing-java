@@ -31,7 +31,7 @@ dependencies {
 ### Code Example
 
 ```java
-import com.optivem.test.Channel;
+import com.optivem.testing.Channel;
 
 public class Example {
     public static void main(String[] args) {

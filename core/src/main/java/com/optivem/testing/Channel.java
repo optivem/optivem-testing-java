@@ -1,4 +1,4 @@
-package com.optivem.test;
+package com.optivem.testing;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,11 +1,11 @@
 # Acceptance Test Module
 
-This module performs acceptance tests by downloading and using the published `optivem-test` package from external repositories.
+This module performs acceptance tests by downloading and using the published `optivem-testing` package from external repositories.
 
 ## Purpose
 
 This acceptance test module verifies that:
-1. The `optivem-test` package can be successfully downloaded from Maven Central
+1. The `optivem-testing` package can be successfully downloaded from Maven Central
 2. The package can be downloaded from GitHub Packages (when configured)
 3. The downloaded package's API works correctly from a consumer's perspective
 4. All functionality is preserved in the published package

@@ -38,7 +38,7 @@ if ($GitHubToken -and $Repository) {
     }
     
     try {
-        $response = Invoke-WebRequest -Uri "https://api.github.com/repos/$Repository/packages/maven/com.optivem.optivem-test/versions" -Headers $headers -Method Get
+        $response = Invoke-WebRequest -Uri "https://api.github.com/repos/$Repository/packages/maven/com.optivem.optivem-testing/versions" -Headers $headers -Method Get
         if ($response.StatusCode -eq 200) {
             $versions = $response.Content | ConvertFrom-Json
             $exists = $versions | Where-Object { $_.name -eq $ReleaseVersion }
