@@ -47,7 +47,7 @@ repositories {
 3. Update the dependency version if needed:
 ```gradle
 dependencies {
-    testImplementation 'com.optivem:optivem-test:1.0.1' // or whatever version is in GitHub Packages
+    testImplementation 'com.optivem:optivem-testing:1.0.1' // or whatever version is in GitHub Packages
 }
 ```
 
@@ -65,7 +65,7 @@ dependencies {
 
 ## Verification Tasks
 
-- `verifyDependencies`: Checks that the optivem-test dependency is properly resolved and available in the classpath
+- `verifyDependencies`: Checks that the optivem-testing dependency is properly resolved and available in the classpath
 
 ## Notes
 

@@ -1,15 +1,5 @@
 # Optivem Test Java Library
-## ⚠️ DEPRECATED - ARTIFACT RENAMED
 
-**This artifact `com.optivem:optivem-test` has been renamed to `com.optivem:optivem-testing`.**
-
-**Please migrate to the new artifact:**
-- Old: `com.optivem:optivem-test`
-- **New: `com.optivem:optivem-testing`**
-
-This repository will continue to exist for the new artifact. Version `1.1.0-DEPRECATED` is the final release under the old name.
-
----
 [![Commit Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/commit-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/commit-stage.yml)
 [![Acceptance Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml)
 [![Release Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/release-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/release-stage.yml)
@@ -40,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.optivem:optivem-test:1.0.0'
+    implementation 'com.optivem:optivem-testing:1.0.0'
 }
 ```
 
@@ -48,7 +38,7 @@ dependencies {
 ```xml
 <dependency>
     <groupId>com.optivem</groupId>
-    <artifactId>optivem-test</artifactId>
+    <artifactId>optivem-testing</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```

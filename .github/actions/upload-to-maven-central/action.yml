@@ -18,7 +18,7 @@ inputs:
   artifact-id:
     description: 'Maven artifact ID'
     required: false
-    default: 'optivem-test'
+    default: 'optivem-testing'
   project-name:
     description: 'Project display name'
     required: false

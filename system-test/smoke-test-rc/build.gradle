@@ -10,5 +10,5 @@ repositories {
 
 dependencies {
     // Automatically use the latest RC version matching the project version
-    testImplementation "com.optivem:optivem-test:${rootProject.ext.baseVersion}-rc.+"
+    testImplementation "com.optivem:optivem-testing:${rootProject.ext.baseVersion}-rc.+"
 }
