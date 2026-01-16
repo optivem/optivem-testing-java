@@ -9,9 +9,9 @@ inputs:
     required: false
     default: 'com.optivem'
   artifact-id:
-    description: 'Maven artifact ID (default: optivem-testing)'
+    description: 'Maven artifact ID (default: optivem-test)'
     required: false
-    default: 'optivem-testing'
+    default: 'optivem-test'
   max-attempts:
     description: 'Maximum number of polling attempts (default: 60)'
     required: false

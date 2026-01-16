@@ -1,4 +1,4 @@
-rootProject.name = 'optivem-testing'
+rootProject.name = 'optivem-test'
 
 include 'core'
 include 'system-test'
