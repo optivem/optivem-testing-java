@@ -7,11 +7,6 @@ on:
         description: 'Version to verify on Maven Central'
         required: true
         type: string
-      delay_minutes:
-        description: 'Minutes to wait before verification'
-        required: false
-        default: '30'
-        type: string
 
 concurrency:
   group: maven-central-verification-${{ github.event.inputs.version }}
@@ -43,16 +38,8 @@ jobs:
       id: version_info
       run: |
         VERSION="${{ github.event.inputs.version }}"
-        DELAY="${{ github.event.inputs.delay_minutes || '30' }}"
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
-        echo "delay=${DELAY}" >> $GITHUB_OUTPUT
         echo "Verifying version: ${VERSION}"
-        echo "Delay: ${DELAY} minutes"
-        
-    - name: Wait for Maven Central propagation
-      run: |
-        echo "⏳ Waiting ${{ steps.version_info.outputs.delay }} minutes for Maven Central propagation..."
-        sleep $((${{ steps.version_info.outputs.delay }} * 60))
         
     - name: Verify RC version on Maven Central
       if: contains(steps.version_info.outputs.version, '-rc.')
