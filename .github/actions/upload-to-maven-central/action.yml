@@ -1,0 +1,27 @@
+name: 'Upload to Maven Central'
+description: 'Creates bundle from existing artifacts and uploads to Maven Central without rebuilding'
+
+inputs:
+  release-version:
+    description: 'Release version to upload'
+    required: true
+  sonatype-username:
+    description: 'Sonatype username'
+    required: true
+  sonatype-password:
+    description: 'Sonatype password'
+    required: true
+  gpg-private-key:
+    description: 'GPG private key for signing'
+    required: true
+  gpg-passphrase:
+    description: 'GPG passphrase'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload to Maven Central
+      shell: pwsh
+      run: |
+        ${{ github.action_path }}/upload-to-maven-central.ps1 -ReleaseVersion "${{ inputs.release-version }}" -SonatypeUsername "${{ inputs.sonatype-username }}" -SonatypePassword "${{ inputs.sonatype-password }}" -GpgPrivateKey "${{ inputs.gpg-private-key }}" -GpgPassphrase "${{ inputs.gpg-passphrase }}"
