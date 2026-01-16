@@ -275,5 +275,9 @@ Write-Host "🔗 Check status: https://central.sonatype.com/publishing/deploymen
 
 # Output the deployment ID for use by subsequent steps
 if ($env:GITHUB_OUTPUT) {
+    Write-Host "   Writing to GITHUB_OUTPUT: $env:GITHUB_OUTPUT" -ForegroundColor Gray
     "deployment-id=$deploymentId" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+    Write-Host "   Output written: deployment-id=$deploymentId" -ForegroundColor Gray
+} else {
+    Write-Host "   ⚠️  GITHUB_OUTPUT not set (running locally)" -ForegroundColor Yellow
 }
