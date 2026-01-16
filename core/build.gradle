@@ -57,8 +57,8 @@ publishing {
             from components.java
             
             pom {
-                name = 'Optivem Test Library'
-                description = 'A simple test library for testing purposes'
+                name = 'Optivem Test Library [DEPRECATED]'
+                description = '⚠️ DEPRECATED: This artifact has been renamed to com.optivem:optivem-testing. Please migrate to the new artifact. This is the final release under the old name.'
                 url = 'https://github.com/optivem/optivem-test-java'
                 
                 licenses {
