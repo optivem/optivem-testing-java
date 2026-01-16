@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       rc_version:
-        description: 'RC version to promote (e.g., 1.0.5-rc.47)'
-        required: true
+        description: 'RC version to promote (e.g., 1.0.5-rc.47, or leave blank for latest RC)'
+        required: false
         type: string
 
 jobs:
@@ -19,11 +19,42 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Find latest RC version if not provided
+      id: find-rc
+      shell: pwsh
+      run: |
+        $rcVersion = "${{ github.event.inputs.rc_version }}"
+        if ([string]::IsNullOrWhiteSpace($rcVersion)) {
+          Write-Host "🔍 No RC version provided, finding latest RC version..." -ForegroundColor Blue
+          
+          # Call GitHub API to get latest RC version
+          $headers = @{
+            "Authorization" = "Bearer ${{ secrets.GITHUB_TOKEN }}"
+            "Accept" = "application/vnd.github+json"
+          }
+          
+          $response = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/packages/maven/com.optivem.optivem-test/versions" -Headers $headers
+          
+          $rcVersions = $response | Where-Object { $_.name -like "*-rc.*" } | Sort-Object { [datetime]$_.created_at } -Descending
+          
+          if ($rcVersions.Count -eq 0) {
+            Write-Host "❌ No RC versions found in GitHub Packages" -ForegroundColor Red
+            exit 1
+          }
+          
+          $latestRc = $rcVersions[0].name
+          Write-Host "✅ Found latest RC version: $latestRc" -ForegroundColor Green
+          echo "rc-version=$latestRc" >> $env:GITHUB_OUTPUT
+        } else {
+          Write-Host "📋 Using provided RC version: $rcVersion" -ForegroundColor Green
+          echo "rc-version=$rcVersion" >> $env:GITHUB_OUTPUT
+        }
+      
     - name: Validate inputs
       id: validate
       uses: ./.github/actions/validate-rc-version
       with:
-        rc-version: ${{ github.event.inputs.rc_version }}
+        rc-version: ${{ steps.find-rc.outputs.rc-version }}
         
     - name: Check if release version already exists
       uses: ./.github/actions/check-release-exists
