@@ -69,6 +69,8 @@ jobs:
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'VALIDATED'
+        max-attempts: '30'
+        poll-interval: '60'
     
     - name: Publish deployment on Maven Central
       uses: ./.github/actions/publish-central-deployment
@@ -81,17 +83,23 @@ jobs:
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'PUBLISHING'
+        max-attempts: '10'
+        poll-interval: '60'
     
     - name: Wait for publishing to complete
       uses: ./.github/actions/wait-for-deployment-validation
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'PUBLISHED'
+        max-attempts: '60'
+        poll-interval: '60'
         
     - name: Wait for Maven Central availability
       uses: ./.github/actions/wait-for-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
+        max-attempts: '120'
+        poll-interval: '60'
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
