@@ -1,3 +1,7 @@
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     // Use the latest release version from Maven Central matching the project version
     testImplementation "com.optivem:optivem-test:${rootProject.ext.baseVersion}"
