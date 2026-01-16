@@ -25,6 +25,7 @@ jobs:
       with:
         rc-version: ${{ github.event.inputs.rc_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        package-name: 'com.optivem.optivem-test'
       
     - name: Validate inputs
       id: validate

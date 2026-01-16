@@ -14,8 +14,7 @@ inputs:
     default: ${{ github.repository }}
   package-name:
     description: 'Package name in GitHub Packages'
-    required: false
-    default: 'com.optivem.optivem-test'
+    required: true
 
 outputs:
   rc-version:
