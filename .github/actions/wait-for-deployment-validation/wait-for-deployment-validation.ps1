@@ -3,6 +3,9 @@ param(
     [string]$DeploymentId,
     
     [Parameter(Mandatory=$true)]
+    [string]$ExpectedState,
+    
+    [Parameter(Mandatory=$true)]
     [string]$SonatypeUsername,
     
     [Parameter(Mandatory=$true)]
@@ -15,8 +18,9 @@ param(
     [int]$PollInterval = 10
 )
 
-Write-Host "⏳ Waiting for deployment validation..." -ForegroundColor Blue
+Write-Host "⏳ Waiting for deployment state: $ExpectedState" -ForegroundColor Blue
 Write-Host "   Deployment ID: $DeploymentId" -ForegroundColor Gray
+Write-Host "   Expected state: $ExpectedState" -ForegroundColor Cyan
 Write-Host "   Max attempts: $MaxAttempts" -ForegroundColor Gray
 Write-Host "   Poll interval: ${PollInterval}s" -ForegroundColor Gray
 Write-Host ""
@@ -45,43 +49,46 @@ while ($attempt -lt $MaxAttempts) {
         $state = $response.deploymentState
         Write-Host "   Status: $state" -ForegroundColor Cyan
         
-        switch ($state) {
-            "VALIDATED" {
+        # Check if we've reached the expected state
+        if ($state -eq $ExpectedState) {
+            Write-Host ""
+            Write-Host "✅ Deployment reached expected state: $ExpectedState" -ForegroundColor Green
+            $validated = $true
+        }
+        # Check for error states
+        elseif ($state -eq "FAILED") {
+            Write-Host ""
+            Write-Host "❌ Deployment failed" -ForegroundColor Red
+            if ($response.PSObject.Properties['errors'] -and $response.errors) {
                 Write-Host ""
-                Write-Host "✅ Deployment validated successfully!" -ForegroundColor Green
-                $validated = $true
-                break
-            }
-            "PUBLISHED" {
-                Write-Host ""
-                Write-Host "⚠️  Deployment already in PUBLISHED state" -ForegroundColor Yellow
-                Write-Host "   This means it was either:" -ForegroundColor Yellow
-                Write-Host "   • Published manually via the UI" -ForegroundColor Yellow
-                Write-Host "   • Already published by a previous workflow run" -ForegroundColor Yellow
-                Write-Host ""
-                Write-Host "❌ Cannot proceed with automated publishing" -ForegroundColor Red
-                exit 1
-            }
-            "FAILED" {
-                Write-Host ""
-                Write-Host "❌ Deployment validation failed" -ForegroundColor Red
-                if ($response.PSObject.Properties['errors'] -and $response.errors) {
-                    Write-Host ""
-                    Write-Host "Errors:" -ForegroundColor Red
-                    $response.errors | ForEach-Object { 
-                        Write-Host "  • $_" -ForegroundColor Red 
-                    }
+                Write-Host "Errors:" -ForegroundColor Red
+                $response.errors | ForEach-Object { 
+                    Write-Host "  • $_" -ForegroundColor Red 
                 }
-                exit 1
             }
-            "PENDING" {
-                Write-Host "   ⏳ Waiting for validation to start..." -ForegroundColor Gray
-            }
-            "VALIDATING" {
-                Write-Host "   🔍 Validation in progress..." -ForegroundColor Gray
-            }
-            default {
-                Write-Host "   ⚠️  Unknown state: $state" -ForegroundColor Yellow
+            exit 1
+        }
+        # Progress messages for different states
+        else {
+            switch ($state) {
+                "PENDING" {
+                    Write-Host "   ⏳ Status: PENDING (waiting to start...)" -ForegroundColor Gray
+                }
+                "VALIDATING" {
+                    Write-Host "   🔍 Status: VALIDATING (in progress...)" -ForegroundColor Gray
+                }
+                "VALIDATED" {
+                    Write-Host "   ✓ Status: VALIDATED (waiting for: $ExpectedState)" -ForegroundColor Gray
+                }
+                "PUBLISHING" {
+                    Write-Host "   📤 Status: PUBLISHING (waiting for: $ExpectedState)" -ForegroundColor Gray
+                }
+                "PUBLISHED" {
+                    Write-Host "   ✓ Status: PUBLISHED (waiting for: $ExpectedState)" -ForegroundColor Gray
+                }
+                default {
+                    Write-Host "   ⚠️  Status: $state (waiting for: $ExpectedState)" -ForegroundColor Yellow
+                }
             }
         }
         
@@ -104,7 +111,8 @@ while ($attempt -lt $MaxAttempts) {
 
 if (-not $validated) {
     Write-Host ""
-    Write-Host "❌ Deployment validation timed out after $MaxAttempts attempts" -ForegroundColor Red
+    Write-Host "❌ Timed out waiting for state '$ExpectedState' after $MaxAttempts attempts" -ForegroundColor Red
+    Write-Host "   Last state: $state" -ForegroundColor Yellow
     Write-Host "   Check status at: https://central.sonatype.com/publishing/deployments" -ForegroundColor Yellow
     exit 1
 }

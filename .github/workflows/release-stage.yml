@@ -66,6 +66,7 @@ jobs:
       uses: ./.github/actions/wait-for-deployment-validation
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
+        expected-state: 'VALIDATED'
         sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
         sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
         max-attempts: '30'
@@ -78,6 +79,26 @@ jobs:
         release-version: ${{ steps.validate.outputs.release-version }}
         sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
         sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
+    
+    - name: Wait for publishing to start
+      uses: ./.github/actions/wait-for-deployment-validation
+      with:
+        deployment-id: ${{ steps.upload.outputs.deployment-id }}
+        expected-state: 'PUBLISHING'
+        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
+        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
+        max-attempts: '30'
+        poll-interval: '10'
+    
+    - name: Wait for publishing to complete
+      uses: ./.github/actions/wait-for-deployment-validation
+      with:
+        deployment-id: ${{ steps.upload.outputs.deployment-id }}
+        expected-state: 'PUBLISHED'
+        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
+        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
+        max-attempts: '60'
+        poll-interval: '30'
         
     - name: Wait for Maven Central availability
       uses: ./.github/actions/wait-for-maven-central
