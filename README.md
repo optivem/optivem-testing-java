@@ -11,24 +11,16 @@ A simple test library built with Java 21 and Gradle for testing and demonstratio
 - Basic arithmetic operations (add, subtract, multiply, divide)
 - Comprehensive unit tests with JaCoCo coverage
 - Automated CI/CD with GitHub Actions
-- Maven publishing to GitHub Packages
+- Published to Maven Central
 
 ## Usage
 
 ### Add as Dependency
 
+The library is available on Maven Central.
+
 #### Gradle
 ```gradle
-repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/optivem/optivem-testing-java")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-        }
-    }
-}
-
 dependencies {
     implementation 'com.optivem:optivem-testing:1.0.0'
 }
@@ -91,7 +83,7 @@ git push origin v1.1.0
 
 2. The GitHub Actions workflow will automatically:
    - Build and test the library
-   - Publish to GitHub Packages
+   - Publish to Maven Central
    - Create a GitHub release with artifacts
 
 ## API Documentation
