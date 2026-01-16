@@ -14,7 +14,6 @@ jobs:
     permissions:
       contents: write
       packages: write
-      workflows: write
     
     env:
       SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
