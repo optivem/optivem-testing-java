@@ -1,0 +1,24 @@
+name: 'Validate RC Version'
+description: 'Validates RC version format and extracts release version'
+
+inputs:
+  rc-version:
+    description: 'RC version to validate (e.g., 1.0.5-rc.47)'
+    required: true
+
+outputs:
+  rc-version:
+    description: 'Validated RC version'
+    value: ${{ steps.validate.outputs.rc_version }}
+  release-version:
+    description: 'Extracted release version'
+    value: ${{ steps.validate.outputs.release_version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate RC version
+      id: validate
+      shell: pwsh
+      run: |
+        ${{ github.action_path }}/../scripts/validate-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}"

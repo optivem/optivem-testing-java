@@ -2,9 +2,14 @@ name: Release Stage
 
 on:
   workflow_dispatch:
+    inputs:
+      rc_version:
+        description: 'RC version to promote (e.g., 1.0.5-rc.47)'
+        required: true
+        type: string
 
 jobs:
-  release:
+  promote-rc-to-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,74 +30,105 @@ jobs:
       with:
         gradle-version: wrapper
         
-    - name: Validate Gradle wrapper
-      uses: gradle/actions/wrapper-validation@v4
-      
-    - name: Make gradlew executable
-      run: chmod +x gradlew
-      
-    - name: Extract base version
-      id: version
-      uses: ./.github/actions/extract-base-version
-      
-    - name: Check if version already exists
-      id: check_version
+    - name: Validate inputs
+      id: validate
+      uses: ./.github/actions/validate-rc-version
+      with:
+        rc-version: ${{ github.event.inputs.rc_version }}
+        
+    - name: Check if release version already exists
+      uses: ./.github/actions/check-release-exists
+      with:
+        release-version: ${{ steps.validate.outputs.release-version }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Download RC artifacts
+      uses: ./.github/actions/download-rc-artifacts
+      with:
+        rc-version: ${{ steps.validate.outputs.rc-version }}
+        github-username: ${{ github.actor }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Prepare release artifacts
+      uses: ./.github/actions/prepare-release-artifacts
+      with:
+        rc-version: ${{ steps.validate.outputs.rc-version }}
+        release-version: ${{ steps.validate.outputs.release-version }}
+        
+    - name: Publish release to GitHub Packages
       run: |
-        VERSION="${{ steps.version.outputs.base_version }}"
-        echo "Checking if version $VERSION already exists..."
-        
-        # Check if package version exists in GitHub Packages
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/packages/maven/com.optivem.optivem-test/versions")
-        
-        if [ "$HTTP_CODE" = "200" ]; then
-          # Package exists, check if this specific version exists
-          EXISTS=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/packages/maven/com.optivem.optivem-test/versions" \
-            | jq -r --arg version "$VERSION" '.[] | select(.name == $version) | .name')
-          
-          if [ "$EXISTS" = "$VERSION" ]; then
-            echo "❌ Version $VERSION already exists in GitHub Packages!"
-            echo "Please update the version in build.gradle before releasing."
-            exit 1
-          else
-            echo "✅ Version $VERSION does not exist yet. Proceeding with release..."
-          fi
-        else
-          echo "✅ No packages found or unable to check. Proceeding with release..."
-        fi
-        
-    - name: Publish to GitHub Packages with the Final Version
-      run: ./gradlew core:publish --no-daemon -Pversion="${{ steps.version.outputs.base_version }}"
+        echo "🚀 Publishing release to GitHub Packages..."
+        RELEASE_VERSION="${{ steps.validate.outputs.release-version }}"
+        ./gradlew core:publishMavenPublicationToGitHubPackagesRepository --no-daemon -Pversion="${RELEASE_VERSION}"
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_WRITE_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Run Release Smoke Tests (GitHub Packages)
-      run: ./gradlew system-test:smoke-test-release-github:test --no-daemon
+    - name: Upload release to Maven Central
+      run: |
+        echo "📤 Uploading release to Maven Central..."
+        RELEASE_VERSION="${{ steps.validate.outputs.release-version }}"
+        ./gradlew core:uploadToCentralPortal --no-daemon --no-configuration-cache -Pversion="${RELEASE_VERSION}"
+      env:
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        
+    - name: Run release smoke tests
+      run: |
+        echo "🧪 Running release smoke tests..."
+        ./gradlew system-test:smoke-test-release-github:test --no-daemon
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_READ_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Create Git Tag
+    - name: Create Git tag and release
+      shell: pwsh
       run: |
-        VERSION="v${{ steps.version.outputs.base_version }}"
+        $releaseVersion = "${{ steps.validate.outputs.release-version }}"
+        $rcVersion = "${{ steps.validate.outputs.rc-version }}"
+        
+        Write-Host "🏷️ Creating Git tag v${releaseVersion}..." -ForegroundColor Blue
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git tag -a "$VERSION" -m "Release $VERSION"
-        git push origin "$VERSION"
+        
+        git tag -a "v${releaseVersion}" -m "Release ${releaseVersion} (promoted from ${rcVersion})"
+        git push origin "v${releaseVersion}"
         
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ steps.version.outputs.base_version }}
-        name: Release ${{ steps.version.outputs.base_version }}
+        tag_name: v${{ steps.validate.outputs.release-version }}
+        name: Release ${{ steps.validate.outputs.release-version }}
+        body: |
+          🎉 **Release ${{ steps.validate.outputs.release-version }}**
+          
+          This release was promoted from RC version `${{ steps.validate.outputs.rc-version }}` after passing all acceptance tests.
+          
+          **Promoted Artifacts:**
+          - Same exact JAR that passed testing
+          - No rebuild - identical artifacts guaranteed
+          
+          **Next Steps:**
+          📤 Manually publish in [Central Portal](https://central.sonatype.com/publishing/deployments)  
+          🧪 Then verify: `.\trigger-verification.ps1 -Version "${{ steps.validate.outputs.release-version }}"`
         files: |
           core/build/libs/*.jar
         generate_release_notes: true
         draft: false
         prerelease: false
+        
+    - name: Display next steps
+      shell: pwsh
+      run: |
+        $releaseVersion = "${{ steps.validate.outputs.release-version }}"
+        Write-Host ""
+        Write-Host "🎉 Release promotion completed successfully!" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "📋 Next Steps:" -ForegroundColor Cyan
+        Write-Host "1. 🌐 Go to: https://central.sonatype.com/publishing/deployments" -ForegroundColor White
+        Write-Host "2. 📤 Manually publish version: ${releaseVersion}" -ForegroundColor White
+        Write-Host "3. 🧪 Verify: .\trigger-verification.ps1 -Version `"${releaseVersion}`"" -ForegroundColor White
+        Write-Host ""
+        Write-Host "✅ Same artifacts that passed RC testing are now released!" -ForegroundColor Green
