@@ -21,4 +21,8 @@ runs:
     - name: Publish deployment on Maven Central
       shell: pwsh
       run: |
-        ${{ github.action_path }}/publish-central-deployment.ps1 -ReleaseVersion "${{ inputs.release-version }}" -SonatypeUsername "${{ inputs.sonatype-username }}" -SonatypePassword "${{ inputs.sonatype-password }}"
+        ${{ github.action_path }}/publish-central-deployment.ps1 `
+          -DeploymentId "${{ inputs.deployment-id }}" `
+          -ReleaseVersion "${{ inputs.release-version }}" `
+          -SonatypeUsername "${{ inputs.sonatype-username }}" `
+          -SonatypePassword "${{ inputs.sonatype-password }}"
