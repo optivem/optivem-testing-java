@@ -4,14 +4,7 @@
 [![Acceptance Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml)
 [![Release Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/release-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/release-stage.yml)
 
-A simple test library built with Java 21 and Gradle for testing and demonstration purposes.
-
-## Features
-
-- Basic arithmetic operations (add, subtract, multiply, divide)
-- Comprehensive unit tests with JaCoCo coverage
-- Automated CI/CD with GitHub Actions
-- Published to Maven Central
+A testing library to support Acceptance Testing in Java.
 
 ## Usage
 
@@ -56,47 +49,6 @@ public class Example {
 - Java 21 or higher
 - Gradle 9.1.0 (included via wrapper)
 
-### Building
-```bash
-./gradlew build
-```
-
-### Running Tests
-```bash
-./gradlew test
-```
-
-### Publishing Locally
-```bash
-./gradlew publishToMavenLocal
-```
-
-## Releasing
-
-To create a new release:
-
-1. Create and push a version tag:
-```bash
-git tag v1.1.0
-git push origin v1.1.0
-```
-
-2. The GitHub Actions workflow will automatically:
-   - Build and test the library
-   - Publish to Maven Central
-   - Create a GitHub release with artifacts
-
-## API Documentation
-
-### CalculatorService
-
-The main calculator class with the following methods:
-
-- `add(double a, double b)` - Returns the sum of two numbers
-- `subtract(double a, double b)` - Returns the difference of two numbers  
-- `multiply(double a, double b)` - Returns the product of two numbers
-- `divide(double a, double b)` - Returns the quotient of two numbers
-  - Throws `IllegalArgumentException` if divisor is zero
 
 ## License
 
