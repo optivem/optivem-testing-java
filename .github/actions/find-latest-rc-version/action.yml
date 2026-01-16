@@ -28,4 +28,4 @@ runs:
       id: find-rc
       shell: pwsh
       run: |
-        ./.github/scripts/find-latest-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}" -PackageName "${{ inputs.package-name }}"
+        ${{ github.action_path }}/find-latest-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}" -PackageName "${{ inputs.package-name }}"

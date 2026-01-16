@@ -21,4 +21,4 @@ runs:
       id: validate
       shell: pwsh
       run: |
-        ./.github/scripts/validate-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}"
+        ${{ github.action_path }}/validate-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}"

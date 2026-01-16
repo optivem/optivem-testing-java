@@ -22,4 +22,4 @@ runs:
     - name: Download RC artifacts
       shell: pwsh
       run: |
-        ./.github/scripts/download-rc-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubUsername "${{ inputs.github-username }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"
+        ${{ github.action_path }}/download-rc-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubUsername "${{ inputs.github-username }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"
