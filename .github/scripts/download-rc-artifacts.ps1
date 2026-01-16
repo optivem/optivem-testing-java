@@ -73,7 +73,7 @@ $env:GITHUB_READ_PACKAGES_TOKEN = $GitHubToken
 
 try {
     Write-Host "Using ./gradlew" -ForegroundColor Cyan
-    & "./gradlew" -b temp-download.gradle downloadRcArtifacts
+    & "./gradlew" --build-file temp-download.gradle downloadRcArtifacts
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Failed to download artifacts (exit code: $LASTEXITCODE)" -ForegroundColor Red
