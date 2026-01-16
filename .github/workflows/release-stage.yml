@@ -104,6 +104,8 @@ jobs:
       uses: ./.github/actions/wait-for-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
+        max-attempts: '60'
+        poll-interval: '60'
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4

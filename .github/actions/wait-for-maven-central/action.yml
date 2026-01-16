@@ -16,8 +16,8 @@ inputs:
     description: 'Maximum number of polling attempts (default: 60)'
     required: false
     default: '60'
-  wait-seconds:
-    description: 'Seconds to wait between attempts (default: 60)'
+  poll-interval:
+    description: 'Seconds between polling attempts (default: 60)'
     required: false
     default: '60'
 
@@ -31,7 +31,7 @@ runs:
         GROUP_PATH=$(echo "${{ inputs.group-id }}" | tr '.' '/')
         ARTIFACT_ID="${{ inputs.artifact-id }}"
         MAX_ATTEMPTS=${{ inputs.max-attempts }}
-        WAIT_SECONDS=${{ inputs.wait-seconds }}
+        WAIT_SECONDS=${{ inputs.poll-interval }}
         ATTEMPT=0
         
         echo "⏳ Waiting for artifact to be available on Maven Central..."
