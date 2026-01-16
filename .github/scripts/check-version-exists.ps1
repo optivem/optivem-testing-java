@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Checks if release version already exists in GitHub Packages and Git tags
+    Checks if version already exists in GitHub Packages
 
 .PARAMETER ReleaseVersion
     The release version to check
@@ -14,7 +14,7 @@
     GitHub repository (owner/repo)
 
 .EXAMPLE
-    .\check-release-exists.ps1 -ReleaseVersion "1.0.5" -GitHubToken $token -Repository "optivem/optivem-test-java"
+    .\check-version-exists.ps1 -ReleaseVersion "1.0.5" -GitHubToken $token -Repository "optivem/optivem-test-java"
 #>
 
 param(
@@ -28,7 +28,7 @@ param(
     [string]$Repository
 )
 
-Write-Host "🔍 Checking if release version $ReleaseVersion already exists..." -ForegroundColor Yellow
+Write-Host "📦 Checking if version $ReleaseVersion exists in GitHub Packages..." -ForegroundColor Blue
 
 # Check GitHub Packages (only if token provided)
 if ($GitHubToken -and $Repository) {
@@ -44,26 +44,19 @@ if ($GitHubToken -and $Repository) {
             $exists = $versions | Where-Object { $_.name -eq $ReleaseVersion }
             
             if ($exists) {
-                Write-Host "❌ Release version $ReleaseVersion already exists in GitHub Packages!" -ForegroundColor Red
+                Write-Host "❌ Version $ReleaseVersion already exists in GitHub Packages!" -ForegroundColor Red
                 Write-Host "Cannot promote RC to an existing release version." -ForegroundColor Red
                 exit 1
+            } else {
+                Write-Host "✅ Version $ReleaseVersion not found in GitHub Packages" -ForegroundColor Green
             }
         }
     } catch {
         Write-Host "⚠️  Could not check GitHub Packages (may not exist yet)" -ForegroundColor Yellow
+        Write-Host "Assuming no packages exist - proceeding..." -ForegroundColor Yellow
     }
 } else {
     Write-Host "⚠️  Skipping GitHub Packages check (no token/repository provided)" -ForegroundColor Yellow
 }
 
-# Check if Git tag already exists
-$tagExists = git rev-parse "v$ReleaseVersion" 2>$null
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "❌ Git tag v$ReleaseVersion already exists!" -ForegroundColor Red
-    Write-Host "That version is already claimed. Consider incrementing to the next version." -ForegroundColor Yellow
-    Write-Host "To reuse this version, delete the tag first: git tag -d v$ReleaseVersion && git push origin :refs/tags/v$ReleaseVersion" -ForegroundColor Cyan
-    exit 1
-}
-
-Write-Host "✅ Release version $ReleaseVersion is available for use." -ForegroundColor Green
 exit 0
