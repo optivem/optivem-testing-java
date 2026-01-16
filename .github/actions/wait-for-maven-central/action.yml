@@ -27,7 +27,7 @@ runs:
     - name: Wait for Maven Central availability
       uses: ./.github/actions/poll-until-condition
       with:
-        check-script: './.github/actions/wait-for-maven-central/check-maven-central-availability.ps1'
+        check-script: '../wait-for-maven-central/check-maven-central-availability.ps1'
         script-args: '${{ inputs.release-version }} ${{ inputs.group-id }} ${{ inputs.artifact-id }}'
         max-attempts: '${{ inputs.max-attempts }}'
         poll-interval: '${{ inputs.poll-interval }}'

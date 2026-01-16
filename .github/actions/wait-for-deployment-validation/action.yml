@@ -23,7 +23,7 @@ runs:
     - name: Wait for deployment state
       uses: ./.github/actions/poll-until-condition
       with:
-        check-script: './.github/actions/wait-for-deployment-validation/check-deployment-state.ps1'
+        check-script: '../wait-for-deployment-validation/check-deployment-state.ps1'
         script-args: '${{ inputs.deployment-id }} ${{ inputs.expected-state }}'
         max-attempts: '${{ inputs.max-attempts }}'
         poll-interval: '${{ inputs.poll-interval }}'
