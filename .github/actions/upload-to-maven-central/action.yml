@@ -5,12 +5,6 @@ inputs:
   release-version:
     description: 'Release version to upload'
     required: true
-  sonatype-username:
-    description: 'Sonatype username'
-    required: true
-  sonatype-password:
-    description: 'Sonatype password'
-    required: true
   gpg-private-key:
     description: 'GPG private key for signing'
     required: true
@@ -84,8 +78,8 @@ runs:
       run: |
         ${{ github.action_path }}/upload-to-maven-central.ps1 `
           -ReleaseVersion "${{ inputs.release-version }}" `
-          -SonatypeUsername "${{ inputs.sonatype-username }}" `
-          -SonatypePassword "${{ inputs.sonatype-password }}" `
+          -SonatypeUsername "$env:SONATYPE_USERNAME" `
+          -SonatypePassword "$env:SONATYPE_PASSWORD" `
           -GpgPrivateKey "${{ inputs.gpg-private-key }}" `
           -GpgPassphrase "${{ inputs.gpg-passphrase }}" `
           -GroupId "${{ inputs.group-id }}" `

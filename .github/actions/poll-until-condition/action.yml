@@ -1,0 +1,36 @@
+name: 'Poll Until Condition'
+description: 'Generic polling action that runs a check script until condition is met or timeout'
+
+inputs:
+  check-script:
+    description: 'Path to the check script (relative to action path, e.g., ./check-deployment-state.ps1)'
+    required: true
+  script-args:
+    description: 'Arguments to pass to the check script (space-separated)'
+    required: false
+    default: ''
+  max-attempts:
+    description: 'Maximum number of polling attempts'
+    required: false
+    default: '30'
+  poll-interval:
+    description: 'Seconds between polling attempts'
+    required: false
+    default: '10'
+  condition-name:
+    description: 'Human-readable name of the condition being waited for'
+    required: false
+    default: 'condition'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Poll until condition met
+      shell: pwsh
+      run: |
+        ${{ github.action_path }}/poll-until-condition.ps1 `
+          -CheckScript "${{ inputs.check-script }}" `
+          -ScriptArgs "${{ inputs.script-args }}" `
+          -MaxAttempts ${{ inputs.max-attempts }} `
+          -PollInterval ${{ inputs.poll-interval }} `
+          -ConditionName "${{ inputs.condition-name }}"

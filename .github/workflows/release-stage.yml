@@ -15,6 +15,10 @@ jobs:
       contents: write
       packages: write
     
+    env:
+      SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -57,8 +61,6 @@ jobs:
       uses: ./.github/actions/upload-to-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
-        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
-        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
         gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
     
@@ -67,8 +69,6 @@ jobs:
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'VALIDATED'
-        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
-        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
         max-attempts: '30'
         poll-interval: '10'
     
@@ -77,35 +77,23 @@ jobs:
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         release-version: ${{ steps.validate.outputs.release-version }}
-        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
-        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
     
     - name: Wait for publishing to start
       uses: ./.github/actions/wait-for-deployment-validation
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'PUBLISHING'
-        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
-        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
-        max-attempts: '30'
-        poll-interval: '10'
     
     - name: Wait for publishing to complete
       uses: ./.github/actions/wait-for-deployment-validation
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'PUBLISHED'
-        sonatype-username: ${{ secrets.SONATYPE_USERNAME }}
-        sonatype-password: ${{ secrets.SONATYPE_PASSWORD }}
-        max-attempts: '60'
-        poll-interval: '30'
         
     - name: Wait for Maven Central availability
       uses: ./.github/actions/wait-for-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
-        max-attempts: '60'
-        poll-interval: '60'
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4

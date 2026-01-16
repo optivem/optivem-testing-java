@@ -8,12 +8,6 @@ inputs:
   release-version:
     description: 'Release version to publish'
     required: true
-  sonatype-username:
-    description: 'Sonatype username'
-    required: true
-  sonatype-password:
-    description: 'Sonatype password'
-    required: true
 
 runs:
   using: 'composite'
@@ -24,5 +18,5 @@ runs:
         ${{ github.action_path }}/publish-central-deployment.ps1 `
           -DeploymentId "${{ inputs.deployment-id }}" `
           -ReleaseVersion "${{ inputs.release-version }}" `
-          -SonatypeUsername "${{ inputs.sonatype-username }}" `
-          -SonatypePassword "${{ inputs.sonatype-password }}"
+          -SonatypeUsername "$env:SONATYPE_USERNAME" `
+          -SonatypePassword "$env:SONATYPE_PASSWORD"

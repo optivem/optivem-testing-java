@@ -8,12 +8,6 @@ inputs:
   expected-state:
     description: 'Expected deployment state to wait for (VALIDATED, PUBLISHING, PUBLISHED)'
     required: true
-  sonatype-username:
-    description: 'Sonatype username'
-    required: true
-  sonatype-password:
-    description: 'Sonatype password'
-    required: true
   max-attempts:
     description: 'Maximum number of polling attempts'
     required: false
@@ -26,13 +20,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Wait for validation
-      shell: pwsh
-      run: |
-        ${{ github.action_path }}/wait-for-deployment-validation.ps1 `
-          -DeploymentId "${{ inputs.deployment-id }}" `
-          -ExpectedState "${{ inputs.expected-state }}" `
-          -SonatypeUsername "${{ inputs.sonatype-username }}" `
-          -SonatypePassword "${{ inputs.sonatype-password }}" `
-          -MaxAttempts ${{ inputs.max-attempts }} `
-          -PollInterval ${{ inputs.poll-interval }}
+    - name: Wait for deployment state
+      uses: ./.github/actions/poll-until-condition
+      with:
+        check-script: './.github/actions/wait-for-deployment-validation/check-deployment-state.ps1'
+        script-args: '${{ inputs.deployment-id }} ${{ inputs.expected-state }}'
+        max-attempts: '${{ inputs.max-attempts }}'
+        poll-interval: '${{ inputs.poll-interval }}'
+        condition-name: 'deployment state ${{ inputs.expected-state }}'
