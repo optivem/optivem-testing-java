@@ -20,4 +20,4 @@ runs:
     - name: Check if release exists
       shell: pwsh
       run: |
-        ${{ github.action_path }}/../scripts/check-release-exists.ps1 -ReleaseVersion "${{ inputs.release-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"
+        ./.github/scripts/check-release-exists.ps1 -ReleaseVersion "${{ inputs.release-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"

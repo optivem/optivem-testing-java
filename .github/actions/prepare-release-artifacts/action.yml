@@ -15,4 +15,4 @@ runs:
     - name: Prepare release artifacts
       shell: pwsh
       run: |
-        ${{ github.action_path }}/../scripts/prepare-release-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -ReleaseVersion "${{ inputs.release-version }}"
+        ./.github/scripts/prepare-release-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -ReleaseVersion "${{ inputs.release-version }}"
