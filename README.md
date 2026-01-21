@@ -1,4 +1,4 @@
-# Optivem Test Java Library
+# Optivem Testing Java Library
 
 [![Commit Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/commit-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/commit-stage.yml)
 [![Acceptance Stage](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml/badge.svg)](https://github.com/optivem/optivem-testing-java/actions/workflows/acceptance-stage.yml)
