@@ -91,7 +91,7 @@ jobs:
       with:
         deployment-id: ${{ steps.upload.outputs.deployment-id }}
         expected-state: 'PUBLISHED'
-        max-attempts: '60'
+        max-attempts: '120'
         poll-interval: '60'
         
     - name: Wait for Maven Central availability
