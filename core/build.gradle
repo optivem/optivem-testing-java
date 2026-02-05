@@ -57,8 +57,8 @@ publishing {
             from components.java
             
             pom {
-                name = 'Optivem Test Library'
-                description = 'A simple test library for testing purposes'
+                name = 'Optivem Testing Library'
+                description = 'Utilities for Acceptance Testing'
                 url = 'https://github.com/optivem/optivem-testing-java'
                 
                 licenses {
