@@ -25,10 +25,10 @@ runs:
   using: 'composite'
   steps:
     - name: Wait for Maven Central availability
-      uses: ./.github/actions/poll-until-condition
+      uses: optivem/poll-until-action@v1.1.0
       with:
-        check-script: '../wait-for-maven-central/check-maven-central-availability.ps1'
+        check-script: .github/actions/wait-for-maven-central/check-maven-central-availability.ps1
         script-args: '${{ inputs.release-version }} ${{ inputs.group-id }} ${{ inputs.artifact-id }}'
-        max-attempts: '${{ inputs.max-attempts }}'
-        poll-interval: '${{ inputs.poll-interval }}'
+        max-retries: ${{ inputs.max-attempts }}
+        interval-seconds: ${{ inputs.poll-interval }}
         condition-name: 'Maven Central availability'
