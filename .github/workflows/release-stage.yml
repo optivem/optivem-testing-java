@@ -44,7 +44,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Download RC artifacts
-      uses: ./.github/actions/download-rc-artifacts
+      uses: ./.github/actions/download-maven-rc-artifacts
       with:
         rc-version: ${{ steps.validate.outputs.rc-version }}
         github-username: ${{ github.actor }}

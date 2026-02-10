@@ -1,5 +1,5 @@
-name: 'Download RC Artifacts'
-description: 'Downloads RC artifacts from GitHub Packages'
+name: 'Download Maven RC Artifacts'
+description: 'Downloads RC artifacts from GitHub Packages (Maven)'
 
 inputs:
   rc-version:
@@ -19,7 +19,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Download RC artifacts
+    - name: Download Maven RC artifacts
       shell: pwsh
       run: |
-        ${{ github.action_path }}/download-rc-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubUsername "${{ inputs.github-username }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"
+        ${{ github.action_path }}/download-maven-rc-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubUsername "${{ inputs.github-username }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}"
