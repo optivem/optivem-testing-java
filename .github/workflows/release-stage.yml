@@ -121,10 +121,9 @@ jobs:
         ./gradlew system-test:smoke-test-release:test --no-daemon -Pversion="${{ steps.validate.outputs.release-version }}"
         
     - name: Create Git tag
-      uses: ./.github/actions/create-git-tag
+      uses: optivem/create-tag-action@v1.0.0
       with:
-        release-version: ${{ steps.validate.outputs.release-version }}
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        tag-name: v${{ steps.validate.outputs.release-version }}
         
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
