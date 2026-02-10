@@ -11,7 +11,7 @@
     The release version to rename to
 
 .EXAMPLE
-    .\prepare-java-release-artifacts.ps1 -RcVersion "1.0.5-rc.47" -ReleaseVersion "1.0.5"
+    .\prepare-maven-release-artifacts.ps1 -RcVersion "1.0.5-rc.47" -ReleaseVersion "1.0.5"
 #>
 
 param(
