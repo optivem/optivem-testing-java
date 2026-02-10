@@ -43,7 +43,7 @@ jobs:
         tag-name: v${{ steps.extract_version.outputs.base_version }}
     - name: Check if GitHub Release exists
       id: check-release
-      uses: optivem/check-release-exists-action@v1
+      uses: optivem/check-release-exists-action@v2
       with:
         version: v${{ steps.extract_version.outputs.base_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
