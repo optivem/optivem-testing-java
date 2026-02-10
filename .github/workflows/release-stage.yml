@@ -37,11 +37,27 @@ jobs:
       with:
         prerelease-version: ${{ steps.find-rc.outputs.rc-version }}
         
-    - name: Check if release version already exists
-      uses: ./.github/actions/check-release-exists
+    - name: Check if Git tag exists
+      uses: optivem/check-tag-exists-action@v1.0.0
+      with:
+        tag-name: v${{ steps.validate.outputs.release-version }}
+    - name: Check if GitHub Release exists
+      id: check-release
+      uses: optivem/check-release-exists-action@v1.0.0
+      with:
+        version: v${{ steps.validate.outputs.release-version }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Fail if release already exists
+      if: steps.check-release.outputs.exists == 'true'
+      run: |
+        echo "::error::Release v${{ steps.validate.outputs.release-version }} already exists. Cannot promote RC to an existing release."
+        exit 1
+    - name: Check if Maven package version exists
+      uses: ./.github/actions/check-maven-package-exists
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
         
     - name: Download RC artifacts
       uses: ./.github/actions/download-maven-rc-artifacts

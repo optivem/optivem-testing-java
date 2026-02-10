@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Checks if version already exists in GitHub Packages
+    Checks if a version already exists for the Maven package in GitHub Packages
 
 .PARAMETER ReleaseVersion
     The release version to check
@@ -14,7 +14,7 @@
     GitHub repository (owner/repo)
 
 .EXAMPLE
-    .\check-version-exists.ps1 -ReleaseVersion "1.0.5" -GitHubToken $token -Repository "optivem/optivem-testing-java"
+    .\check-maven-package-exists.ps1 -ReleaseVersion "1.0.5" -GitHubToken $token -Repository "optivem/optivem-testing-java"
 #>
 
 param(
