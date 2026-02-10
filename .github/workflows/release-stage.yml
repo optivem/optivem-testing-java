@@ -31,11 +31,11 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         package-name: 'com.optivem.optivem-testing'
       
-    - name: Validate inputs
+    - name: Extract release version
       id: validate
-      uses: ./.github/actions/validate-rc-version
+      uses: optivem/extract-release-version-action@v1.0.0
       with:
-        rc-version: ${{ steps.find-rc.outputs.rc-version }}
+        prerelease-version: ${{ steps.find-rc.outputs.rc-version }}
         
     - name: Check if release version already exists
       uses: ./.github/actions/check-release-exists
@@ -46,14 +46,14 @@ jobs:
     - name: Download RC artifacts
       uses: ./.github/actions/download-maven-rc-artifacts
       with:
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        rc-version: ${{ steps.find-rc.outputs.rc-version }}
         github-username: ${{ github.actor }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Prepare release artifacts
       uses: ./.github/actions/prepare-java-release-artifacts
       with:
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        rc-version: ${{ steps.find-rc.outputs.rc-version }}
         release-version: ${{ steps.validate.outputs.release-version }}
       
     - name: Upload release to Maven Central
@@ -133,7 +133,7 @@ jobs:
         body: |
           🎉 **Release ${{ steps.validate.outputs.release-version }}**
           
-          This release was promoted from RC version `${{ steps.validate.outputs.rc-version }}` after passing all acceptance tests.
+          This release was promoted from RC version `${{ steps.find-rc.outputs.rc-version }}` after passing all acceptance tests.
           
           **Promoted Artifacts:**
           - Same exact JAR that passed testing
