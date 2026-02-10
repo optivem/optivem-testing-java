@@ -33,17 +33,17 @@ jobs:
       
     - name: Extract release version
       id: validate
-      uses: optivem/extract-release-version-action@v1.0.0
+      uses: optivem/extract-release-version-action@v1
       with:
         prerelease-version: ${{ steps.find-rc.outputs.rc-version }}
         
     - name: Check if Git tag exists
-      uses: optivem/check-tag-exists-action@v1.0.0
+      uses: optivem/check-tag-exists-action@v1
       with:
         tag-name: v${{ steps.validate.outputs.release-version }}
     - name: Check if GitHub Release exists
       id: check-release
-      uses: optivem/check-release-exists-action@v1.0.0
+      uses: optivem/check-release-exists-action@v1
       with:
         version: v${{ steps.validate.outputs.release-version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -137,7 +137,7 @@ jobs:
         ./gradlew system-test:smoke-test-release:test --no-daemon -Pversion="${{ steps.validate.outputs.release-version }}"
         
     - name: Create Git tag
-      uses: optivem/create-tag-action@v1.0.0
+      uses: optivem/create-tag-action@v1
       with:
         tag-name: v${{ steps.validate.outputs.release-version }}
         

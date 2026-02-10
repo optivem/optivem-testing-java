@@ -25,7 +25,7 @@ runs:
   using: 'composite'
   steps:
     - name: Wait for Maven Central availability
-      uses: optivem/poll-until-action@v1.1.0
+      uses: optivem/poll-until-action@v1
       with:
         check-script: .github/actions/wait-for-maven-central/check-maven-central-availability.ps1
         script-args: '${{ inputs.release-version }} ${{ inputs.group-id }} ${{ inputs.artifact-id }}'

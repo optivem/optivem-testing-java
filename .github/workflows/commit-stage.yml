@@ -38,12 +38,12 @@ jobs:
       uses: ./.github/actions/extract-gradle-version
     
     - name: Check if Git tag exists
-      uses: optivem/check-tag-exists-action@v1.0.0
+      uses: optivem/check-tag-exists-action@v1
       with:
         tag-name: v${{ steps.extract_version.outputs.base_version }}
     - name: Check if GitHub Release exists
       id: check-release
-      uses: optivem/check-release-exists-action@v1.0.0
+      uses: optivem/check-release-exists-action@v1
       with:
         version: v${{ steps.extract_version.outputs.base_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -21,7 +21,7 @@ runs:
   using: 'composite'
   steps:
     - name: Wait for deployment state
-      uses: optivem/poll-until-action@v1.1.0
+      uses: optivem/poll-until-action@v1
       with:
         check-script: .github/actions/wait-for-deployment-validation/check-deployment-state.ps1
         script-args: '${{ inputs.deployment-id }} ${{ inputs.expected-state }}'
