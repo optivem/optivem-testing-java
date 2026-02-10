@@ -1,4 +1,4 @@
-name: 'Prepare Release Artifacts'
+name: 'Prepare Java Release Artifacts'
 description: 'Prepares release artifacts by copying and renaming RC artifacts'
 
 inputs:
@@ -12,7 +12,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Prepare release artifacts
+    - name: Prepare Java release artifacts
       shell: pwsh
       run: |
-        ${{ github.action_path }}/prepare-release-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -ReleaseVersion "${{ inputs.release-version }}"
+        ${{ github.action_path }}/prepare-java-release-artifacts.ps1 -RcVersion "${{ inputs.rc-version }}" -ReleaseVersion "${{ inputs.release-version }}"

@@ -51,7 +51,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Prepare release artifacts
-      uses: ./.github/actions/prepare-release-artifacts
+      uses: ./.github/actions/prepare-java-release-artifacts
       with:
         rc-version: ${{ steps.validate.outputs.rc-version }}
         release-version: ${{ steps.validate.outputs.release-version }}
