@@ -25,7 +25,7 @@ jobs:
       
     - name: Find latest RC version if not provided
       id: find-rc
-      uses: ./.github/actions/find-latest-rc-version
+      uses: ./.github/actions/find-latest-maven-rc-version
       with:
         rc-version: ${{ github.event.inputs.rc_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
