@@ -74,7 +74,7 @@ jobs:
       
     - name: Upload release to Maven Central
       id: upload
-      uses: ./.github/actions/upload-maven-central
+      uses: ./.github/actions/publish-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}

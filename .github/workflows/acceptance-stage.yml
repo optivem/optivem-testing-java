@@ -5,10 +5,6 @@ on:
     - cron: '0 * * * *' # Runs every hour
   workflow_dispatch: # Allow manual triggering
 
-concurrency:
-  group: acceptance-stage-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   smoke-test-rc:
     runs-on: ubuntu-latest
