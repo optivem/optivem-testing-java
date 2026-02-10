@@ -1,4 +1,4 @@
-name: 'Upload to Maven Central'
+name: 'Upload Maven Central'
 description: 'Creates bundle from existing artifacts and uploads to Maven Central without rebuilding'
 
 inputs:
@@ -76,7 +76,7 @@ runs:
       id: upload
       shell: pwsh
       run: |
-        ${{ github.action_path }}/upload-to-maven-central.ps1 `
+        ${{ github.action_path }}/upload-maven-central.ps1 `
           -ReleaseVersion "${{ inputs.release-version }}" `
           -SonatypeUsername "$env:SONATYPE_USERNAME" `
           -SonatypePassword "$env:SONATYPE_PASSWORD" `

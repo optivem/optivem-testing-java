@@ -20,7 +20,7 @@
     GPG passphrase
 
 .EXAMPLE
-    .\upload-to-maven-central.ps1 -ReleaseVersion "1.0.5" -SonatypeUsername "user" -SonatypePassword "pass" -GpgPrivateKey $key -GpgPassphrase $phrase
+    .\upload-maven-central.ps1 -ReleaseVersion "1.0.5" -SonatypeUsername "user" -SonatypePassword "pass" -GpgPrivateKey $key -GpgPassphrase $phrase
 #>
 
 param(
