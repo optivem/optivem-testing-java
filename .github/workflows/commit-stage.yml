@@ -39,7 +39,7 @@ jobs:
 
     - name: Extract base version
       id: extract_version
-      uses: ./.github/actions/extract-base-version
+      uses: ./.github/actions/extract-gradle-version
     
     - name: Check if base version already released
       uses: ./.github/actions/check-release-exists

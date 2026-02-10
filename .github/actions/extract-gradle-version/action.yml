@@ -1,4 +1,4 @@
-name: 'Extract Base Version'
+name: 'Extract Gradle Version'
 description: 'Extract base version from build.gradle file'
 outputs:
   base_version:
@@ -7,7 +7,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Extract base version from build.gradle
+    - name: Extract Gradle version from build.gradle
       id: extract
       shell: pwsh
       run: |
