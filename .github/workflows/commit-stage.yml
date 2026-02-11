@@ -7,10 +7,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch: # Allow manual triggering
 
-concurrency:
-  group: commit-stage
-  cancel-in-progress: true
-
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -39,13 +35,29 @@ jobs:
 
     - name: Extract base version
       id: extract_version
-      uses: ./.github/actions/extract-base-version
+      uses: ./.github/actions/extract-gradle-version
     
-    - name: Check if base version already released
-      uses: ./.github/actions/check-release-exists
+    - name: Check if Git tag exists
+      uses: optivem/check-tag-exists-action@v1
+      with:
+        tag-name: v${{ steps.extract_version.outputs.base_version }}
+    - name: Check if GitHub Release exists
+      id: check-release
+      uses: optivem/check-release-exists-action@v2
+      with:
+        version: v${{ steps.extract_version.outputs.base_version }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Fail if release already exists
+      if: steps.check-release.outputs.exists == 'true'
+      run: |
+        echo "::error::Release v${{ steps.extract_version.outputs.base_version }} already exists. Cannot use this version."
+        exit 1
+    - name: Check if Maven package version exists
+      uses: ./.github/actions/check-maven-package-exists
       with:
         release-version: ${{ steps.extract_version.outputs.base_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
     
     - name: Determine RC version
       id: version

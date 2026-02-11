@@ -1,5 +1,5 @@
-name: 'Find Latest RC Version'
-description: 'Finds the latest RC version from GitHub Packages if no version is provided'
+name: 'Find Latest Maven RC Version'
+description: 'Finds the latest RC version from GitHub Packages (Maven) if no version is provided'
 
 inputs:
   rc-version:
@@ -24,8 +24,8 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Find latest RC version if not provided
+    - name: Find latest Maven RC version if not provided
       id: find-rc
       shell: pwsh
       run: |
-        ${{ github.action_path }}/find-latest-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}" -PackageName "${{ inputs.package-name }}"
+        ${{ github.action_path }}/find-latest-maven-rc-version.ps1 -RcVersion "${{ inputs.rc-version }}" -GitHubToken "${{ inputs.github-token }}" -Repository "${{ inputs.repository }}" -PackageName "${{ inputs.package-name }}"

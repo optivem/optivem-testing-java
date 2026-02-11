@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Downloads RC artifacts from GitHub Packages
+    Downloads RC artifacts from GitHub Packages (Maven)
 
 .PARAMETER RcVersion
     The RC version to download
@@ -17,7 +17,7 @@
     GitHub repository (owner/repo)
 
 .EXAMPLE
-    .\download-rc-artifacts.ps1 -RcVersion "1.0.5-rc.47" -GitHubUsername "user" -GitHubToken $token -Repository "optivem/optivem-testing-java"
+    .\download-maven-rc-artifacts.ps1 -RcVersion "1.0.5-rc.47" -GitHubUsername "user" -GitHubToken $token -Repository "optivem/optivem-testing-java"
 #>
 
 param(

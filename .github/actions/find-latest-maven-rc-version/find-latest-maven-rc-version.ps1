@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Finds the latest RC version from GitHub Packages if no version is provided
+    Finds the latest RC version from GitHub Packages (Maven) if no version is provided
 
 .PARAMETER RcVersion
     RC version to use (optional - if empty, will find latest)
@@ -17,8 +17,8 @@
     Package name in GitHub Packages
 
 .EXAMPLE
-    .\find-latest-rc-version.ps1 -GitHubToken $token -Repository "optivem/optivem-testing-java"
-    .\find-latest-rc-version.ps1 -RcVersion "1.0.5-rc.47" -GitHubToken $token -Repository "optivem/optivem-testing-java"
+    .\find-latest-maven-rc-version.ps1 -GitHubToken $token -Repository "optivem/optivem-testing-java"
+    .\find-latest-maven-rc-version.ps1 -RcVersion "1.0.5-rc.47" -GitHubToken $token -Repository "optivem/optivem-testing-java"
 #>
 
 param(

@@ -25,40 +25,56 @@ jobs:
       
     - name: Find latest RC version if not provided
       id: find-rc
-      uses: ./.github/actions/find-latest-rc-version
+      uses: ./.github/actions/find-latest-maven-rc-version
       with:
         rc-version: ${{ github.event.inputs.rc_version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         package-name: 'com.optivem.optivem-testing'
       
-    - name: Validate inputs
+    - name: Extract release version
       id: validate
-      uses: ./.github/actions/validate-rc-version
+      uses: optivem/extract-release-version-action@v1
       with:
-        rc-version: ${{ steps.find-rc.outputs.rc-version }}
+        prerelease-version: ${{ steps.find-rc.outputs.rc-version }}
         
-    - name: Check if release version already exists
-      uses: ./.github/actions/check-release-exists
+    - name: Check if Git tag exists
+      uses: optivem/check-tag-exists-action@v1
+      with:
+        tag-name: v${{ steps.validate.outputs.release-version }}
+    - name: Check if GitHub Release exists
+      id: check-release
+      uses: optivem/check-release-exists-action@v2
+      with:
+        version: v${{ steps.validate.outputs.release-version }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Fail if release already exists
+      if: steps.check-release.outputs.exists == 'true'
+      run: |
+        echo "::error::Release v${{ steps.validate.outputs.release-version }} already exists. Cannot promote RC to an existing release."
+        exit 1
+    - name: Check if Maven package version exists
+      uses: ./.github/actions/check-maven-package-exists
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
         
     - name: Download RC artifacts
-      uses: ./.github/actions/download-rc-artifacts
+      uses: ./.github/actions/download-maven-rc-artifacts
       with:
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        rc-version: ${{ steps.find-rc.outputs.rc-version }}
         github-username: ${{ github.actor }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Prepare release artifacts
-      uses: ./.github/actions/prepare-release-artifacts
+      uses: ./.github/actions/prepare-maven-release-artifacts
       with:
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        rc-version: ${{ steps.find-rc.outputs.rc-version }}
         release-version: ${{ steps.validate.outputs.release-version }}
       
     - name: Upload release to Maven Central
       id: upload
-      uses: ./.github/actions/upload-to-maven-central
+      uses: ./.github/actions/publish-maven-central
       with:
         release-version: ${{ steps.validate.outputs.release-version }}
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -121,10 +137,9 @@ jobs:
         ./gradlew system-test:smoke-test-release:test --no-daemon -Pversion="${{ steps.validate.outputs.release-version }}"
         
     - name: Create Git tag
-      uses: ./.github/actions/create-git-tag
+      uses: optivem/create-tag-action@v1
       with:
-        release-version: ${{ steps.validate.outputs.release-version }}
-        rc-version: ${{ steps.validate.outputs.rc-version }}
+        tag-name: v${{ steps.validate.outputs.release-version }}
         
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
@@ -134,7 +149,7 @@ jobs:
         body: |
           🎉 **Release ${{ steps.validate.outputs.release-version }}**
           
-          This release was promoted from RC version `${{ steps.validate.outputs.rc-version }}` after passing all acceptance tests.
+          This release was promoted from RC version `${{ steps.find-rc.outputs.rc-version }}` after passing all acceptance tests.
           
           **Promoted Artifacts:**
           - Same exact JAR that passed testing

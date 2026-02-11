@@ -21,10 +21,10 @@ runs:
   using: 'composite'
   steps:
     - name: Wait for deployment state
-      uses: ./.github/actions/poll-until-condition
+      uses: optivem/poll-until-action@v1
       with:
-        check-script: '../wait-for-deployment-validation/check-deployment-state.ps1'
+        check-script: .github/actions/wait-for-deployment-validation/check-deployment-state.ps1
         script-args: '${{ inputs.deployment-id }} ${{ inputs.expected-state }}'
-        max-attempts: '${{ inputs.max-attempts }}'
-        poll-interval: '${{ inputs.poll-interval }}'
+        max-retries: ${{ inputs.max-attempts }}
+        interval-seconds: ${{ inputs.poll-interval }}
         condition-name: 'Deployment State ${{ inputs.expected-state }}'
