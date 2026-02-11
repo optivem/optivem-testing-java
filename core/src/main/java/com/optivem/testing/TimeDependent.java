@@ -34,12 +34,16 @@ import java.lang.annotation.Target;
  * gradlew :system-test:acceptance-test:test -DexcludeTags=time-dependent
  * </pre>
  * 
+ * <p>For backward compatibility, the tag {@code time} is also applied so that
+ * {@code -DincludeTags=time} and {@code -DexcludeTags=time} continue to work.
+ * 
  * <h3>IDE Support:</h3>
  * Most IDEs that support JUnit 5 will recognize this tag automatically.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("time-dependent")
+@Tag("time")
 @Isolated("Time-dependent test")
 public @interface TimeDependent {
     /**
