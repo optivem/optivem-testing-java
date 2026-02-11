@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * 
  * <p>Example usage:
  * <pre>
- * &#64;Time("2024-01-15T17:30:00Z")
+ * &#64;TimeDependent("2024-01-15T17:30:00Z")
  * void discountRateShouldBe15percentWhenTimeAfter5pm() {
  *     // Test implementation
  * }
@@ -26,12 +26,12 @@ import java.lang.annotation.Target;
  * 
  * <h3>Run ONLY time-dependent tests:</h3>
  * <pre>
- * gradlew :system-test:acceptance-test:test -DincludeTags=time
+ * gradlew :system-test:acceptance-test:test -DincludeTags=time-dependent
  * </pre>
  * 
  * <h3>Run all tests EXCEPT time-dependent tests:</h3>
  * <pre>
- * gradlew :system-test:acceptance-test:test -DexcludeTags=time
+ * gradlew :system-test:acceptance-test:test -DexcludeTags=time-dependent
  * </pre>
  * 
  * <h3>IDE Support:</h3>
@@ -39,9 +39,9 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Tag("time")
+@Tag("time-dependent")
 @Isolated("Time-dependent test")
-public @interface Time {
+public @interface TimeDependent {
     /**
      * The specific time value for this test (ISO-8601 format).
      * Used for documentation and potential future automation.
